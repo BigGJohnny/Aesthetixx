@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AESTHETIX — Customise Your Character</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,900;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #080808;
+    --white: #f0ece4;
+    --accent: #c8a96e;
+    --dim: #2a2a2a;
+    --mid: #888;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'DM Mono', monospace;
+    cursor: none;
+    overflow-x: hidden;
+  }
+
+  /* Custom cursor */
+  #cursor {
+    position: fixed;
+    width: 12px;
+    height: 12px;
+    background: var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s, width 0.2s, height 0.2s;
+    mix-blend-mode: difference;
+  }
+  #cursor-ring {
+    position: fixed;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.15s ease, width 0.3s, height 0.3s, opacity 0.3s;
+    opacity: 0.5;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 48px;
+    mix-blend-mode: difference;
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 0.25em;
+    color: var(--white);
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 40px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--white);
+    text-decoration: none;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+    text-transform: uppercase;
+  }
+
+  .nav-links a:hover { opacity: 1; }
+
+  /* HERO */
+  .hero {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 60% 50% at 50% 50%, #1a1408 0%, transparent 70%),
+      repeating-linear-gradient(0deg, transparent, transparent 80px, #ffffff04 80px, #ffffff04 81px),
+      repeating-linear-gradient(90deg, transparent, transparent 80px, #ffffff04 80px, #ffffff04 81px);
+  }
+
+  .hero-grain {
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  .hero-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.4em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.3s;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(64px, 10vw, 140px);
+    font-weight: 900;
+    line-height: 0.9;
+    text-align: center;
+    letter-spacing: -0.02em;
+    position: relative;
+    z-index: 2;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.5s;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    margin-top: 32px;
+    font-size: 13px;
+    letter-spacing: 0.15em;
+    color: var(--mid);
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.7s;
+  }
+
+  .hero-cta {
+    margin-top: 56px;
+    display: flex;
+    gap: 16px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.9s;
+  }
+
+  .btn-primary {
+    padding: 16px 40px;
+    background: var(--accent);
+    color: var(--black);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    border: none;
+    cursor: none;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-primary:hover {
+    background: var(--white);
+    transform: translateY(-2px);
+  }
+
+  .btn-ghost {
+    padding: 16px 40px;
+    background: transparent;
+    color: var(--white);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    border: 1px solid #444;
+    cursor: none;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--white);
+    transform: translateY(-2px);
+  }
+
+  .scroll-indicator {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 1.2s;
+  }
+
+  .scroll-indicator span {
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    color: var(--mid);
+    text-transform: uppercase;
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 48px;
+    background: linear-gradient(to bottom, var(--accent), transparent);
+    animation: scrollPulse 1.5s ease-in-out infinite;
+  }
+
+  /* CHARACTER SELECT SECTION */
+  .select-section {
+    padding: 120px 48px;
+    position: relative;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 72px;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 6vw, 96px);
+    letter-spacing: 0.05em;
+    line-height: 1;
+  }
+
+  .section-title span {
+    color: var(--accent);
+  }
+
+  .section-count {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--mid);
+    padding-bottom: 8px;
+  }
+
+  /* Aesthetic Cards Grid */
+  .aesthetics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+  }
+
+  .aesthetic-card {
+    position: relative;
+    height: 480px;
+    overflow: hidden;
+    cursor: none;
+    group: true;
+  }
+
+  .aesthetic-card:first-child {
+    grid-column: span 2;
+    height: 560px;
+  }
+
+  .aesthetic-card:nth-child(4) {
+    grid-column: span 2;
+  }
+
+  .aesthetic-card:nth-child(8) {
+    grid-column: span 2;
+  }
+
+  .card-bg {
+    position: absolute;
+    inset: 0;
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .aesthetic-card:hover .card-bg {
+    transform: scale(1.05);
+  }
+
+  /* Each aesthetic has its own color palette */
+  .old-money .card-bg { background: linear-gradient(160deg, #1a1508 0%, #2d2010 40%, #0d0d0a 100%); }
+  .y2k .card-bg { background: linear-gradient(160deg, #0d0020 0%, #1a0030 40%, #2d0050 100%); }
+  .grunge .card-bg { background: linear-gradient(160deg, #0a0a0a 0%, #1a0505 40%, #0d0d0d 100%); }
+  .softgirl .card-bg { background: linear-gradient(160deg, #120610 0%, #1e0818 40%, #0d050d 100%); }
+  .vintage .card-bg { background: linear-gradient(160deg, #100a04 0%, #1a1208 40%, #0d0a04 100%); }
+  .goth .card-bg { background: linear-gradient(160deg, #050508 0%, #0a0010 40%, #050505 100%); }
+  .starboy .card-bg { background: linear-gradient(160deg, #020510 0%, #050a1a 40%, #000205 100%); }
+  .softboy .card-bg { background: linear-gradient(160deg, #100510 0%, #1a0a1a 40%, #0d050d 100%); }
+  .streetwear .card-bg { background: linear-gradient(160deg, #050505 0%, #0f0f0f 40%, #080808 100%); }
+
+  /* Pattern overlays per aesthetic */
+  .old-money .card-pattern {
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(45deg, transparent, transparent 20px, #c8a96e08 20px, #c8a96e08 21px);
+  }
+  .y2k .card-pattern {
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 30% 70%, #ff00ff15 0%, transparent 50%),
+                radial-gradient(circle at 70% 30%, #00ffff15 0%, transparent 50%);
+  }
+  .grunge .card-pattern {
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(90deg, transparent, transparent 40px, #ff000008 40px, #ff000008 41px);
+  }
+  .softgirl .card-pattern {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 100%, #ff88cc14 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, #ffaadd10 0%, transparent 40%);
+  }
+  .vintage .card-pattern {
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(135deg, transparent, transparent 18px, #c8a96e06 18px, #c8a96e06 19px),
+                radial-gradient(ellipse at 30% 70%, #a0783010 0%, transparent 55%);
+  }
+  .goth .card-pattern {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, #6600aa18 0%, transparent 60%);
+  }
+  .starboy .card-pattern {
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 80% 20%, #ffffff10 0%, transparent 40%),
+                radial-gradient(circle at 20% 80%, #4488ff10 0%, transparent 40%);
+  }
+  .softboy .card-pattern {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 100%, #ff88cc12 0%, transparent 60%);
+  }
+  .streetwear .card-pattern {
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 30px, #ffffff04 30px, #ffffff04 31px);
+  }
+
+  .card-accent-line {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .aesthetic-card:hover .card-accent-line { transform: scaleX(1); }
+
+  .old-money .card-accent-line { background: var(--accent); }
+  .y2k .card-accent-line { background: linear-gradient(90deg, #ff00ff, #00ffff); }
+  .grunge .card-accent-line { background: #ff2222; }
+  .softgirl .card-accent-line { background: linear-gradient(90deg, #ffaacc, #ffccee); }
+  .vintage .card-accent-line { background: linear-gradient(90deg, #c8a96e, #e8c98e); }
+  .goth .card-accent-line { background: #9900cc; }
+  .starboy .card-accent-line { background: linear-gradient(90deg, #4488ff, #ffffff); }
+  .softboy .card-accent-line { background: linear-gradient(90deg, #ff88cc, #cc88ff); }
+  .streetwear .card-accent-line { background: #ffffff; }
+
+  .card-content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 32px;
+  }
+
+  .card-number {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    opacity: 0.3;
+  }
+
+  .card-icon {
+    font-size: 32px;
+    margin-bottom: 16px;
+    display: block;
+    transform: translateY(8px);
+    transition: transform 0.3s ease;
+  }
+
+  .aesthetic-card:hover .card-icon {
+    transform: translateY(0);
+  }
+
+  .card-label {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    opacity: 0.5;
+    transition: opacity 0.3s;
+  }
+
+  .aesthetic-card:hover .card-label { opacity: 0.8; }
+
+  .card-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(36px, 4vw, 56px);
+    letter-spacing: 0.05em;
+    line-height: 1;
+    transition: transform 0.3s ease;
+  }
+
+  .aesthetic-card:hover .card-name {
+    transform: translateX(4px);
+  }
+
+  .old-money .card-name { color: var(--accent); }
+  .y2k .card-name { color: #dd88ff; }
+  .grunge .card-name { color: #ff4444; }
+  .softgirl .card-name { color: #ffbbdd; }
+  .vintage .card-name { color: #d4a96a; }
+  .goth .card-name { color: #cc66ff; }
+  .starboy .card-name { color: #88aaff; }
+  .softboy .card-name { color: #ffaacc; }
+  .streetwear .card-name { color: var(--white); }
+
+  .card-desc {
+    margin-top: 8px;
+    font-size: 11px;
+    color: var(--mid);
+    line-height: 1.6;
+    max-width: 280px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .aesthetic-card:hover .card-desc {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .card-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.3s ease 0.05s, transform 0.3s ease 0.05s;
+  }
+
+  .aesthetic-card:hover .card-cta {
+    opacity: 0.7;
+    transform: translateY(0);
+  }
+
+  .card-cta-arrow {
+    transition: transform 0.2s;
+  }
+
+  .aesthetic-card:hover .card-cta-arrow {
+    transform: translateX(4px);
+  }
+
+  /* MARQUEE */
+  .marquee-section {
+    padding: 40px 0;
+    border-top: 1px solid #1a1a1a;
+    border-bottom: 1px solid #1a1a1a;
+    overflow: hidden;
+    background: #050505;
+  }
+
+  .marquee-track {
+    display: flex;
+    gap: 0;
+    animation: marquee 20s linear infinite;
+    white-space: nowrap;
+  }
+
+  .marquee-item {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    padding: 0 48px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 0.15em;
+    color: #333;
+  }
+
+  .marquee-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+
+  /* HOW IT WORKS */
+  .how-section {
+    padding: 120px 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+    border-top: 1px solid #111;
+  }
+
+  .how-left .eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.35em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+
+  .how-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(36px, 4vw, 60px);
+    line-height: 1.1;
+    font-weight: 900;
+  }
+
+  .how-title em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .how-body {
+    margin-top: 24px;
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--mid);
+    max-width: 400px;
+  }
+
+  .how-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .step {
+    display: flex;
+    gap: 32px;
+    align-items: flex-start;
+    padding: 32px 0;
+    border-bottom: 1px solid #111;
+    transition: border-color 0.3s;
+  }
+
+  .step:hover { border-color: #333; }
+  .step:first-child { border-top: 1px solid #111; }
+
+  .step-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    color: #1a1a1a;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: color 0.3s;
+  }
+
+  .step:hover .step-num { color: var(--accent); }
+
+  .step-content {}
+
+  .step-title {
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .step-desc {
+    font-size: 12px;
+    color: var(--mid);
+    line-height: 1.7;
+  }
+
+  /* STORES SECTION */
+  .stores-section {
+    padding: 120px 48px;
+    border-top: 1px solid #111;
+    background: #050505;
+  }
+
+  .stores-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 64px;
+  }
+
+  .stores-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(40px, 5vw, 72px);
+    letter-spacing: 0.05em;
+  }
+
+  .stores-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: #111;
+  }
+
+  .store-card {
+    background: #050505;
+    padding: 40px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    cursor: none;
+    transition: background 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .store-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+
+  .store-card:hover { background: #0a0a0a; }
+  .store-card:hover::after { transform: scaleX(1); }
+
+  .store-aesthetic-tag {
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent);
+    opacity: 0.7;
+  }
+
+  .store-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 900;
+  }
+
+  .store-desc {
+    font-size: 11px;
+    color: var(--mid);
+    line-height: 1.7;
+    flex: 1;
+  }
+
+  .store-count {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: #444;
+  }
+
+  /* FOOTER CTA */
+  .footer-cta {
+    padding: 160px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border-top: 1px solid #111;
+  }
+
+  .footer-cta-bg {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 100%, #c8a96e0a 0%, transparent 70%);
+  }
+
+  .footer-cta-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(48px, 8vw, 120px);
+    font-weight: 900;
+    line-height: 0.95;
+    position: relative;
+    z-index: 1;
+  }
+
+  .footer-cta-title em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .footer-cta-sub {
+    margin-top: 32px;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    color: var(--mid);
+    text-transform: uppercase;
+    position: relative;
+    z-index: 1;
+  }
+
+  .footer-cta-btn {
+    margin-top: 56px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 40px 48px;
+    border-top: 1px solid #111;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 0.25em;
+  }
+
+  .footer-copy {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--mid);
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+
+  .footer-links a {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--mid);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
+  .footer-links a:hover { color: var(--white); }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 1; transform: scaleY(1); }
+    50% { opacity: 0.4; transform: scaleY(0.7); }
+  }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    nav { padding: 20px 24px; }
+    .nav-links { display: none; }
+    .select-section { padding: 80px 24px; }
+    .aesthetics-grid { grid-template-columns: 1fr 1fr; }
+    .aesthetic-card:first-child { grid-column: span 2; }
+    .aesthetic-card:nth-child(4) { grid-column: span 1; }
+    .aesthetic-card:nth-child(8) { grid-column: span 2; }
+    .how-section { grid-template-columns: 1fr; padding: 80px 24px; }
+    .stores-grid { grid-template-columns: 1fr 1fr; }
+    .stores-section { padding: 80px 24px; }
+    .footer-cta { padding: 100px 24px; }
+    footer { flex-direction: column; gap: 24px; text-align: center; padding: 32px 24px; }
+    .section-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">AESTHETIX</div>
+  <ul class="nav-links">
+    <li><a href="#">Aesthetics</a></li>
+    <li><a href="#">Stores</a></li>
+    <li><a href="#">New In</a></li>
+    <li><a href="#">List Your Store</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grain"></div>
+
+  <p class="hero-eyebrow">The Fashion Multiverse</p>
+  <h1 class="hero-title">
+    Customise<br><em>Your Character</em>
+  </h1>
+  <p class="hero-sub">Old Money · Y2K · Grunge · Goth · Starboy · Soft Boy · Streetwear · Soft Girl · Vintage</p>
+
+  <div class="hero-cta">
+    <a href="#aesthetics" class="btn-primary">Enter the Archive</a>
+    <a href="#" class="btn-ghost">List Your Store</a>
+  </div>
+
+  <div class="scroll-indicator">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-section">
+  <div class="marquee-track">
+    <!-- duplicated for seamless loop -->
+    <div class="marquee-item"><span class="marquee-dot"></span> Old Money</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Y2K</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Grunge</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Goth</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Starboy</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Soft Boy</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Streetwear</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Soft Girl</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Vintage</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Old Money</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Y2K</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Grunge</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Goth</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Starboy</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Soft Boy</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Streetwear</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Soft Girl</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Vintage</div>
+  </div>
+</div>
+
+<!-- AESTHETIC SELECT -->
+<section class="select-section" id="aesthetics">
+  <div class="section-header">
+    <h2 class="section-title">Choose Your<br><span>Aesthetic</span></h2>
+    <span class="section-count">09 Worlds · 100+ Stores</span>
+  </div>
+
+  <div class="aesthetics-grid">
+
+    <!-- OLD MONEY — featured large -->
+    <div class="aesthetic-card old-money" onclick="window.location='old-money.html'">
+      <div class="card-bg"></div>
+      <div class="card-pattern"></div>
+      <div class="card-accent-line"></div>
+      <div class="card-content">
+        <span class="card-number">01</span>
+        <span class="card-icon">⌚</span>
+        <p class="card-label">Aesthetic</p>
+        <h3 class="card-name">Old Money</h3>
+        <p class="card-desc">Understated luxury. Cashmere, tailoring, and the quiet confidence of generational wealth.</p>
+        <span class="card-cta">Browse Collection <span class="card-cta-arrow">→</span></span>
+      </div>
+    </div>
+
+    <!-- Y2K -->
+    <div class="aesthetic-card y2k" onclick="window.location='y2k.html'">
+      <div class="card-bg"></div>
+      <div class="card-pattern"></div>
+      <div class="card-accent-line"></div>
+      <div class="card-content">
+        <span class="card-number">02</span>
+        <span class="card-icon">💿</span>
+        <p class="card-label">Aesthetic</p>
+        <h3 class="card-name">Y2K</h3>
+        <p class="card-desc">Chrome, butterfly clips, and low-rise everything. The future that was.</p>
+        <span class="card-cta">Browse Collection <span class="card-cta-arrow">→</span></span>
+      </div>
+    </div>
+
+    <!-- GRUNGE -->
+    <div class="aesthetic-card grunge" onclick="window.location='grunge.html'">
+      <div class="card-bg"></div>
+      <div class="card-pattern"></div>
+      <div class="card-accent-line"></div>
+      <div class="card-content">
+        <span class="card-number">03</span>
+        <span class="card-icon">🎸</span>
+        <p class="card-label">Aesthetic</p>
+        <h3 class="card-name">Grunge</h3>
+        <p class="card-desc">Flannel, ripped denim, combat boots. Seattle noise dressed up as a wardrobe.</p>
+        <span class="card-cta">Browse Collection <span class="card-cta-arrow">→</span></span>
+      </div>
+    </div>
+
+    <!-- GOTH -->
+    <div class="aesthetic-card goth" onclick="window.location='goth.html'">
+      <div class="card-bg"></div>
+      <div class="card-pattern"></div>
+      <div class="card-accent-line"></div>
+      <div class="card-content">
+        <span class="card-number">04</span>
+        <span class="card-icon">🦇</span>
+        <p class="card-label">Aesthetic</p>
+        <h3 class="card-name">Goth</h3>
+        <p class="card-desc">All black, velvet, lace, and Victorian edges. Darkness as identity.</p>
+        <span class="card-cta">Browse Collection <span class="card-cta-arrow">→</span></span>
+      </div>
+    </div>
+
+    <!-- STARBOY -->
+    <div class="aesthetic-card starboy" onclick="window.location='starboy.html'">
+        <div class="card-bg"></div>
+        <div class="card-pattern"></div>
+        <div class="card-accent-line"></div>
+        <div class="card-content">
+            <span class="card-number">05</span>
+            <span class="card-icon">⭐</span>
+            <p class="card-label">Aesthetic</p>
+            <h3 class="card-name">Starboy</h3>
+            <p class="card-desc">Dark luxury streetwear. XO energy. Fits that hit different at 2AM.</p>
+            <span class="card-cta">Browse Collection <span class="card-cta-arrow">→</span></span>
+        </div>
+    </div>
+
+    <!-- SOFT BOY -->
+    <div class="aesthetic-card softboy">
+      <div class="card-bg"></div>
+      <div class="card-pattern"></div>
+      <div class="card-accent-line"></div>
+      <div class="card-content">
+        <span class="card-number">06</span>
+        <span class="card-icon">🌸</span>
+        <p class="card-label">Aesthetic</p>
+        <h3 class="card-name">Soft Boy</h3>
+        <p class="card-desc">Pastel knits, vintage tees, indie playlists in physical form.</p>
+        <span class="card-cta">Browse Collection <span class="card-cta-arrow">→</span></span>
+      </div>
+    </div>
+
+    <!-- STREETWEAR -->
+    <div class="aesthetic-card streetwear">
+      <div class="card-bg"></div>
+      <div class="card-pattern"></div>
+      <div class="card-accent-line"></div>
+      <div class="card-content">
+        <span class="card-number">07</span>
+        <span class="card-icon">👟</span>
+        <p class="card-label">Aesthetic</p>
+        <h3 class="card-name">Streetwear</h3>
+        <p class="card-desc">Grails, drops, and heat. The culture wearing itself on the outside.</p>
+        <span class="card-cta">Browse Collection <span class="card-cta-arrow">→</span></span>
+      </div>
+    </div>
+
+    <!-- SOFT GIRL / COTTAGECORE -->
+    <div class="aesthetic-card softgirl">
+      <div class="card-bg"></div>
+      <div class="card-pattern"></div>
+      <div class="card-accent-line"></div>
+      <div class="card-content">
+        <span class="card-number">08</span>
+        <span class="card-icon">🌸</span>
+        <p class="card-label">Aesthetic</p>
+        <h3 class="card-name">Soft Girl</h3>
+        <p class="card-desc">Floral frocks, cottagecore knits, blush tones, and the romance of a slower world.</p>
+        <span class="card-cta">Browse Collection <span class="card-cta-arrow">→</span></span>
+      </div>
+    </div>
+
+    <!-- VINTAGE -->
+    <div class="aesthetic-card vintage">
+      <div class="card-bg"></div>
+      <div class="card-pattern"></div>
+      <div class="card-accent-line"></div>
+      <div class="card-content">
+        <span class="card-number">09</span>
+        <span class="card-icon">🎞️</span>
+        <p class="card-label">Aesthetic</p>
+        <h3 class="card-name">Vintage</h3>
+        <p class="card-desc">Deadstock denim, thrifted silk, lived-in leather. Fashion that already happened and still hits harder.</p>
+        <span class="card-cta">Browse Collection <span class="card-cta-arrow">→</span></span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section">
+  <div class="how-left">
+    <p class="eyebrow">How It Works</p>
+    <h2 class="how-title">One world.<br><em>Every store.</em></h2>
+    <p class="how-body">Aesthetix curates the best fashion stores across the internet, organised by the aesthetic they represent. No algorithm. No noise. Just taste.</p>
+  </div>
+  <div class="how-steps">
+    <div class="step">
+      <span class="step-num">01</span>
+      <div class="step-content">
+        <p class="step-title">Pick Your Aesthetic</p>
+        <p class="step-desc">Choose from 7 curated worlds. Each one a complete universe of style with its own rules.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-num">02</span>
+      <div class="step-content">
+        <p class="step-title">Browse by Category</p>
+        <p class="step-desc">Shirts, pants, jackets, accessories — filtered through the lens of your aesthetic.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-num">03</span>
+      <div class="step-content">
+        <p class="step-title">Shop Across Stores</p>
+        <p class="step-desc">Products from multiple stores shown together. Sort by store if you've got a favourite.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-num">04</span>
+      <div class="step-content">
+        <p class="step-title">Customise Your Character</p>
+        <p class="step-desc">Build your wardrobe like you'd build a character. This is your world now.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED STORES -->
+<section class="stores-section">
+  <div class="stores-header">
+    <h2 class="stores-title">Featured<br>Stores</h2>
+    <a href="#" class="btn-ghost">View All Stores</a>
+  </div>
+  <div class="stores-grid">
+    <div class="store-card">
+      <span class="store-aesthetic-tag">Old Money</span>
+      <h3 class="store-name">Ralph Lauren</h3>
+      <p class="store-desc">The original American dream, tailored into polo shirts and equestrian elegance.</p>
+      <span class="store-count">240 products</span>
+    </div>
+    <div class="store-card">
+      <span class="store-aesthetic-tag">Y2K</span>
+      <h3 class="store-name">JUICY COUTURE</h3>
+      <p class="store-desc">Tracksuits, bedazzled everything, and the velour resurrection nobody asked for but everyone wanted.</p>
+      <span class="store-count">180 products</span>
+    </div>
+    <div class="store-card">
+      <span class="store-aesthetic-tag">Streetwear</span>
+      <h3 class="store-name">Palace</h3>
+      <p class="store-desc">London skate heritage with a sense of humour. Drops that are gone before you blink.</p>
+      <span class="store-count">95 products</span>
+    </div>
+    <div class="store-card">
+      <span class="store-aesthetic-tag">Goth</span>
+      <h3 class="store-name">Killstar</h3>
+      <p class="store-desc">Darkness made wearable. Occult references and velvet collars for the aesthetically committed.</p>
+      <span class="store-count">310 products</span>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER CTA -->
+<section class="footer-cta">
+  <div class="footer-cta-bg"></div>
+  <h2 class="footer-cta-title">
+    Your fit.<br><em>Your world.</em><br>Your character.
+  </h2>
+  <p class="footer-cta-sub">Join 12,000+ users already building their wardrobe</p>
+  <div class="footer-cta-btn">
+    <a href="#aesthetics" class="btn-primary">Start Browsing</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">AESTHETIX</div>
+  <span class="footer-copy">© 2025 Aesthetix. All rights reserved.</span>
+  <ul class="footer-links">
+    <li><a href="#">Privacy</a></li>
+    <li><a href="#">Terms</a></li>
+    <li><a href="#">Contact</a></li>
+  </ul>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursor-ring');
+  let mouseX = 0, mouseY = 0;
+  let ringX = 0, ringY = 0;
+
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    cursor.style.left = mouseX + 'px';
+    cursor.style.top = mouseY + 'px';
+  });
+
+  function animateRing() {
+    ringX += (mouseX - ringX) * 0.12;
+    ringY += (mouseY - ringY) * 0.12;
+    ring.style.left = ringX + 'px';
+    ring.style.top = ringY + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  // Cursor expand on hover
+  document.querySelectorAll('a, button, .aesthetic-card, .store-card').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.width = '20px';
+      cursor.style.height = '20px';
+      ring.style.width = '56px';
+      ring.style.height = '56px';
+      ring.style.opacity = '0.8';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.width = '12px';
+      cursor.style.height = '12px';
+      ring.style.width = '36px';
+      ring.style.height = '36px';
+      ring.style.opacity = '0.5';
+    });
+  });
+
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.aesthetic-card, .step, .store-card').forEach((el, i) => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(30px)';
+    el.style.transition = `opacity 0.6s ease ${i * 0.05}s, transform 0.6s ease ${i * 0.05}s`;
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
