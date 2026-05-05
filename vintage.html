@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vintage — AESTHETIX</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:wght@300;400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:      #f2ead8;
+    --paper-mid:  #e8dcc4;
+    --paper-dark: #d4c4a0;
+    --ink:        #1c160d;
+    --ink-mid:    #3d3020;
+    --ink-light:  #7a6848;
+    --rust:       #b5420a;
+    --rust-light: #d4601c;
+    --sage:       #5c6b4a;
+    --sage-light: #7a8f62;
+    --sepia:      #8b6914;
+    --sepia-light:#c49a2a;
+    --border:     #c8b48a;
+    --white:      #faf6ec;
+    --film:       rgba(180,140,60,.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Special Elite', cursive;
+    cursor: none;
+    overflow-x: hidden;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 9990;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+    opacity: 0.6;
+  }
+
+  /* CURSOR */
+  #cursor {
+    position: fixed; width: 8px; height: 8px;
+    background: var(--rust); border-radius: 50%;
+    pointer-events: none; z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: width .2s, height .2s, background .2s;
+  }
+  #cursor-ring {
+    position: fixed; width: 28px; height: 28px;
+    border: 1px solid var(--rust); border-radius: 50%;
+    pointer-events: none; z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: width .3s, height .3s, opacity .3s;
+    opacity: .3;
+  }
+  body.on-dark #cursor      { background: var(--paper); }
+  body.on-dark #cursor-ring { border-color: rgba(242,234,216,.5); }
+
+  /* STAMP DECORATION */
+  .stamp {
+    display: inline-block;
+    border: 2px solid currentColor;
+    padding: 3px 8px;
+    font-size: 9px; letter-spacing: .3em; text-transform: uppercase;
+    transform: rotate(-2deg);
+    opacity: .7;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 48px; height: 64px;
+    transition: background .4s, border-color .4s;
+  }
+  nav.light { background: rgba(242,234,216,.96); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); }
+  nav.dark  { background: rgba(12,9,4,.5);       backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,.05); }
+
+  .logo { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: .25em; text-decoration: none; transition: color .3s; }
+  nav.light .logo { color: var(--ink); }
+  nav.dark  .logo { color: var(--paper); }
+
+  .nav-links { display: flex; gap: 36px; list-style: none; }
+  .nav-links a { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .18em; text-transform: uppercase; text-decoration: none; opacity: .5; transition: opacity .2s, color .3s; }
+  nav.light .nav-links a { color: var(--ink); }
+  nav.dark  .nav-links a { color: var(--paper); }
+  .nav-links a:hover { opacity: 1; }
+
+  .nav-tag { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .25em; text-transform: uppercase; padding: 5px 12px; border: 1px solid; transition: border-color .3s, color .3s; }
+  nav.light .nav-tag { border-color: var(--rust); color: var(--rust); }
+  nav.dark  .nav-tag { border-color: rgba(181,66,10,.5); color: rgba(212,96,28,.8); }
+
+  /* ── HERO ── */
+  .hero { position: relative; height: 100vh; min-height: 640px; overflow: hidden; }
+
+  /* Film-strip side borders */
+  .hero::before,
+  .hero::after {
+    content: '';
+    position: absolute; top: 0; bottom: 0; width: 36px; z-index: 4; pointer-events: none;
+  }
+  .hero::before { left: 0; background: repeating-linear-gradient(to bottom, #0a0704 0px, #0a0704 18px, transparent 18px, transparent 36px); opacity: .85; }
+  .hero::after  { right: 0; background: repeating-linear-gradient(to bottom, #0a0704 0px, #0a0704 18px, transparent 18px, transparent 36px); opacity: .85; }
+
+  .slide {
+    position: absolute; inset: 0;
+    background-size: cover; background-position: center;
+    opacity: 0; transform: scale(1.05);
+    transition: opacity 1.8s cubic-bezier(.4,0,.2,1), transform 10s cubic-bezier(.25,.46,.45,.94);
+    filter: sepia(30%) contrast(1.05) brightness(0.9);
+  }
+  .slide.active { opacity: 1; transform: scale(1); }
+
+  /* Placeholder gradient slides for demo */
+  .slide-1 { background: linear-gradient(135deg, #2c1f0e 0%, #5c3a1a 40%, #8b5e30 70%, #3d2810 100%); }
+  .slide-2 { background: linear-gradient(135deg, #1a2c1a 0%, #2d4a2d 40%, #4a6b35 70%, #1e3018 100%); }
+  .slide-3 { background: linear-gradient(135deg, #2c200a 0%, #6b4a18 40%, #9a7030 70%, #4a2e0a 100%); }
+
+  /* Add texture to demo slides */
+  .slide::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 30% 40%, rgba(200,160,80,.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 60%, rgba(100,60,20,.2) 0%, transparent 50%);
+  }
+
+  .hero-vignette {
+    position: absolute; inset: 0; z-index: 3; pointer-events: none;
+    background: linear-gradient(to bottom,
+      rgba(0,0,0,.4) 0%,
+      transparent 25%,
+      transparent 50%,
+      rgba(0,0,0,.65) 100%);
+  }
+
+  /* Film-burn top edge */
+  .hero-burn {
+    position: absolute; top: 0; left: 0; right: 0; height: 120px; z-index: 3; pointer-events: none;
+    background: linear-gradient(to bottom, rgba(180,100,20,.25), transparent);
+  }
+
+  .slide-dots {
+    position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 8px; z-index: 10;
+  }
+  .dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,.3); cursor: none; transition: all .3s; }
+  .dot.active { background: var(--paper); transform: scale(1.5); }
+
+  .slide-counter {
+    position: absolute; bottom: 36px; right: 56px;
+    font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .2em;
+    color: rgba(242,234,216,.4); z-index: 10;
+  }
+
+  .hero-content {
+    position: absolute; inset: 0; z-index: 5;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 0 72px 96px;
+  }
+
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: .5em; color: rgba(212,192,140,.7); text-transform: uppercase;
+    margin-bottom: 20px; opacity: 0; animation: fadeUp .8s ease forwards .4s;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(80px, 13vw, 170px); font-weight: 900; line-height: .84;
+    color: var(--paper); text-shadow: 2px 4px 48px rgba(0,0,0,.4), 0 0 80px rgba(180,100,20,.2);
+    opacity: 0; animation: fadeUp .9s ease forwards .55s;
+    position: relative;
+  }
+  .hero-title .word-2 {
+    display: block;
+    font-style: italic;
+    color: var(--sepia-light);
+    margin-left: 60px;
+  }
+
+  /* Typewritten subtitle */
+  .hero-typewriter {
+    font-family: 'Special Elite', cursive;
+    font-size: 16px; color: rgba(242,234,216,.65);
+    margin-top: 28px; letter-spacing: .08em; line-height: 1.6;
+    opacity: 0; animation: fadeUp .8s ease forwards .85s;
+    max-width: 420px;
+    border-left: 2px solid rgba(181,66,10,.5);
+    padding-left: 20px;
+  }
+
+  .hero-bottom {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    margin-top: 40px;
+    opacity: 0; animation: fadeUp .8s ease forwards 1s;
+  }
+
+  .hero-era-tags { display: flex; gap: 10px; flex-wrap: wrap; }
+  .era-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px; letter-spacing: .25em; text-transform: uppercase;
+    padding: 5px 12px; border: 1px solid rgba(242,234,216,.25);
+    color: rgba(242,234,216,.55);
+    transition: all .3s;
+  }
+  .era-tag:hover { border-color: var(--rust-light); color: var(--paper); }
+
+  .hero-stats { display: flex; gap: 36px; }
+  .hero-stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 40px; color: var(--sepia-light); line-height: 1; }
+  .hero-stat-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .22em; color: rgba(242,234,216,.4); text-transform: uppercase; margin-top: 4px; }
+
+  @keyframes fadeUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
+
+  /* ── DIVIDER: TORN PAPER EDGE ── */
+  .torn-edge {
+    position: relative; height: 48px; background: var(--white); overflow: hidden; margin-top: -1px;
+  }
+  .torn-edge::before {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0; height: 48px;
+    background: var(--paper);
+    clip-path: polygon(0 100%, 0 60%, 2% 40%, 4% 55%, 6% 35%, 8% 50%, 10% 25%, 12% 45%, 14% 30%, 16% 50%, 18% 20%, 20% 42%, 22% 28%, 24% 48%, 26% 32%, 28% 52%, 30% 22%, 32% 44%, 34% 28%, 36% 50%, 38% 18%, 40% 40%, 42% 26%, 44% 46%, 46% 30%, 48% 52%, 50% 24%, 52% 44%, 54% 28%, 56% 48%, 58% 20%, 60% 42%, 62% 26%, 64% 48%, 66% 32%, 68% 52%, 70% 22%, 72% 44%, 74% 28%, 76% 50%, 78% 18%, 80% 40%, 82% 26%, 84% 46%, 86% 30%, 88% 52%, 90% 24%, 92% 44%, 94% 28%, 96% 48%, 98% 32%, 100% 50%, 100% 100%);
+  }
+
+  /* ── FILTER BAR ── */
+  .filter-bar {
+    position: sticky; top: 64px; z-index: 100;
+    background: var(--white); border-bottom: 1px solid var(--border);
+    padding: 0 48px;
+  }
+  .filter-inner { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; gap: 20px; }
+  .filter-cats { display: flex; list-style: none; overflow-x: auto; scrollbar-width: none; }
+  .filter-cats::-webkit-scrollbar { display: none; }
+  .fcat {
+    padding: 8px 18px; font-size: 10px; letter-spacing: .18em; text-transform: uppercase;
+    font-family: 'DM Mono', monospace;
+    color: var(--ink-light); cursor: none; white-space: nowrap;
+    border-bottom: 2px solid transparent; transition: color .2s, border-color .2s;
+  }
+  .fcat:hover { color: var(--ink); }
+  .fcat.active { color: var(--rust); border-bottom-color: var(--rust); }
+  .filter-right { display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+  .sort-select {
+    background: transparent; border: 1px solid var(--border); color: var(--ink-light);
+    font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .1em;
+    padding: 7px 12px; cursor: none; outline: none; appearance: none;
+  }
+  .results-count { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .12em; color: var(--ink-light); white-space: nowrap; }
+
+  /* ── MAIN LAYOUT ── */
+  .main-layout { display: grid; grid-template-columns: 220px 1fr; }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    border-right: 1px solid var(--border); padding: 40px 28px;
+    position: sticky; top: 112px; height: fit-content;
+    background: var(--white);
+  }
+  .sb-section { margin-bottom: 36px; }
+  .sb-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px; letter-spacing: .35em; text-transform: uppercase;
+    color: var(--rust); margin-bottom: 16px; padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sb-stores { display: flex; flex-direction: column; }
+  .sb-store { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--paper-mid); cursor: none; transition: all .2s; }
+  .sb-store:hover .sb-name { color: var(--rust); }
+  .sb-check { width: 13px; height: 13px; border: 1px solid var(--paper-dark); margin-right: 10px; flex-shrink: 0; transition: all .2s; }
+  .sb-store.checked .sb-check { background: var(--rust); border-color: var(--rust); }
+  .sb-name { font-size: 11px; transition: color .2s; }
+  .sb-cnt  { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--ink-light); }
+  .price-range { display: flex; flex-direction: column; gap: 12px; }
+  .price-inputs { display: flex; gap: 8px; align-items: center; }
+  .price-input {
+    background: var(--paper); border: 1px solid var(--border); color: var(--ink);
+    font-family: 'DM Mono', monospace; font-size: 11px; padding: 7px 9px; width: 72px; outline: none;
+  }
+  .price-dash { color: var(--ink-light); font-size: 11px; }
+  .price-slider { width: 100%; height: 2px; background: var(--paper-dark); outline: none; border: none; -webkit-appearance: none; cursor: none; }
+  .price-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; background: var(--rust); border-radius: 50%; cursor: none; }
+  .sb-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+  .sb-tag {
+    padding: 5px 10px; border: 1px solid var(--paper-dark);
+    font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--ink-light); cursor: none; transition: all .2s;
+  }
+  .sb-tag:hover, .sb-tag.active { background: var(--rust); border-color: var(--rust); color: var(--paper); }
+
+  /* ── PRODUCT GRID AREA ── */
+  .grid-area { padding: 48px 40px; background: var(--paper); }
+
+  /* Editorial intro strip */
+  .editorial-band {
+    display: flex; align-items: flex-start; gap: 40px;
+    margin-bottom: 52px; padding-bottom: 40px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+  .editorial-band::before {
+    content: '❧'; position: absolute; left: -8px; top: -4px;
+    color: var(--rust); font-size: 20px; opacity: .5;
+  }
+  .ed-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: 42px; line-height: 1.0; color: var(--ink);
+    font-weight: 900; flex-shrink: 0; max-width: 200px;
+  }
+  .ed-headline em { font-style: italic; color: var(--rust); display: block; }
+  .ed-body {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 14px; line-height: 1.75; color: var(--ink-mid);
+    border-left: 2px solid var(--border); padding-left: 24px; margin-top: 4px;
+  }
+  .ed-pullquote {
+    font-family: 'Playfair Display', serif;
+    font-style: italic; font-size: 18px;
+    color: var(--rust); margin-top: 14px; line-height: 1.5;
+  }
+
+  /* Section header */
+  .section-hdr {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 28px;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 700; color: var(--ink);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .section-title::before {
+    content: ''; display: block;
+    width: 24px; height: 2px; background: var(--rust);
+  }
+  .section-view-all {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--rust); text-decoration: none; opacity: .7; transition: opacity .2s;
+  }
+  .section-view-all:hover { opacity: 1; }
+
+  /* ── PRODUCT GRID ── */
+  .product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 48px; }
+
+  /* Reveal animations */
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity .6s ease, transform .6s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  .product-card { position: relative; cursor: none; }
+
+  .product-img {
+    position: relative; overflow: hidden; background: var(--paper-mid);
+    aspect-ratio: 3/4;
+  }
+
+  /* Photo placeholder gradients styled like vintage fabric/clothing */
+  .product-img.p1 { background: linear-gradient(160deg, #8b6040 0%, #c49060 40%, #e8c090 70%, #a07048 100%); }
+  .product-img.p2 { background: linear-gradient(160deg, #2d3d25 0%, #4a5c35 40%, #7a8c5a 70%, #3a4c2a 100%); }
+  .product-img.p3 { background: linear-gradient(160deg, #3d2010 0%, #7a3018 40%, #a04830 70%, #4a1c08 100%); }
+  .product-img.p4 { background: linear-gradient(160deg, #3a3020 0%, #6a5a3a 40%, #9a8a5a 70%, #4a3a24 100%); }
+  .product-img.p5 { background: linear-gradient(160deg, #1a2830 0%, #2a4050 40%, #4a6878 70%, #1e3040 100%); }
+  .product-img.p6 { background: linear-gradient(160deg, #5a3818 0%, #8a5828 40%, #c09050 70%, #6a4020 100%); }
+
+  /* Faded photo texture overlay */
+  .product-img::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 40% 30%, rgba(255,240,200,.12) 0%, transparent 55%);
+    mix-blend-mode: screen;
+  }
+
+  /* Price tag decoration */
+  .product-tag-deco {
+    position: absolute; top: 14px; left: 14px; z-index: 3;
+    background: var(--paper); border: 1px solid var(--border);
+    padding: 3px 8px;
+    font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .15em;
+    color: var(--ink-light); text-transform: uppercase;
+    transform: rotate(-1deg);
+    box-shadow: 1px 1px 4px rgba(0,0,0,.12);
+  }
+  .product-tag-deco::before {
+    content: '';
+    position: absolute; right: -6px; top: 50%; transform: translateY(-50%);
+    width: 0; height: 0;
+    border-top: 5px solid transparent; border-bottom: 5px solid transparent;
+    border-left: 6px solid var(--border);
+  }
+
+  .product-era {
+    position: absolute; bottom: 14px; right: 14px; z-index: 3;
+    font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .2em;
+    color: rgba(242,234,216,.7); text-transform: uppercase;
+    background: rgba(12,8,4,.5); padding: 4px 8px; backdrop-filter: blur(4px);
+  }
+
+  .product-quick {
+    position: absolute; inset: 0; z-index: 4;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(242,234,216,.92);
+    font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--ink); opacity: 0;
+    transition: opacity .3s;
+  }
+  .product-card:hover .product-quick { opacity: 1; }
+  .product-card:hover .product-img img { transform: scale(1.04); }
+
+  .product-info { padding: 16px 0 0; }
+  .product-store {
+    font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .22em;
+    text-transform: uppercase; color: var(--rust); margin-bottom: 5px;
+  }
+  .product-name {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 14px; color: var(--ink); line-height: 1.3; margin-bottom: 10px;
+  }
+  .product-bottom { display: flex; align-items: center; justify-content: space-between; }
+  .product-price {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px; font-weight: 700; color: var(--ink);
+  }
+  .product-link {
+    font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .15em;
+    text-transform: uppercase; color: var(--rust); text-decoration: none;
+    border-bottom: 1px solid var(--border); padding-bottom: 1px; transition: border-color .2s;
+  }
+  .product-link:hover { border-color: var(--rust); }
+
+  /* ── MOOD STRIP — Polaroid-style ── */
+  .polaroid-strip {
+    display: flex; gap: 20px; overflow-x: auto; padding: 8px 0 20px;
+    scrollbar-width: none; margin-bottom: 52px;
+  }
+  .polaroid-strip::-webkit-scrollbar { display: none; }
+
+  .polaroid {
+    flex-shrink: 0; background: #faf6ec; padding: 10px 10px 32px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.18), 0 1px 3px rgba(0,0,0,.1);
+    transform: rotate(-1.5deg); transition: transform .3s, box-shadow .3s;
+    cursor: none;
+  }
+  .polaroid:nth-child(even) { transform: rotate(1.2deg); margin-top: 16px; }
+  .polaroid:hover { transform: rotate(0) scale(1.03) !important; box-shadow: 0 10px 36px rgba(0,0,0,.28); z-index: 2; }
+
+  .polaroid-img { width: 180px; height: 180px; object-fit: cover; display: block; filter: sepia(20%) contrast(1.05) brightness(0.92); }
+
+  /* Polaroid gradient for demo */
+  .pol-g1 { width: 180px; height: 180px; background: linear-gradient(135deg, #9a7040 0%, #c49860 60%, #e8c888 100%); }
+  .pol-g2 { width: 180px; height: 180px; background: linear-gradient(135deg, #3a5030 0%, #5c7848 60%, #8aaa6a 100%); }
+  .pol-g3 { width: 180px; height: 180px; background: linear-gradient(135deg, #6a3818 0%, #9a5828 60%, #c08050 100%); }
+  .pol-g4 { width: 180px; height: 180px; background: linear-gradient(135deg, #2a3840 0%, #4a5c68 60%, #7a9098 100%); }
+  .pol-g5 { width: 180px; height: 180px; background: linear-gradient(135deg, #4a3020 0%, #7a5030 60%, #a87850 100%); }
+
+  .polaroid-caption {
+    font-family: 'Special Elite', cursive;
+    font-size: 11px; color: var(--ink-light); text-align: center;
+    margin-top: 10px; letter-spacing: .04em;
+  }
+
+  /* ── STORES FEATURE ── */
+  .stores-feature {
+    background: var(--ink);
+    padding: 80px 0 80px;
+    position: relative; overflow: hidden;
+  }
+  .stores-feature::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 48px, rgba(255,255,255,.02) 48px, rgba(255,255,255,.02) 49px),
+                repeating-linear-gradient(90deg, transparent, transparent 48px, rgba(255,255,255,.015) 48px, rgba(255,255,255,.015) 49px);
+  }
+
+  .stores-feature-hdr {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    padding: 0 60px 52px; border-bottom: 1px solid rgba(255,255,255,.06); margin-bottom: 52px;
+    position: relative; z-index: 1;
+  }
+  .sf-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 52px; font-weight: 900; color: var(--paper); line-height: 1;
+  }
+  .sf-title em { font-style: italic; color: var(--rust-light); }
+  .view-all {
+    font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .25em;
+    text-transform: uppercase; color: rgba(242,234,216,.4); text-decoration: none;
+    border: 1px solid rgba(242,234,216,.15); padding: 10px 20px; margin-top: 8px;
+    transition: all .3s;
+  }
+  .view-all:hover { color: var(--paper); border-color: rgba(242,234,216,.4); }
+
+  .stores-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
+    border-top: 1px solid rgba(255,255,255,.05); position: relative; z-index: 1;
+  }
+
+  .store-card {
+    padding: 36px 32px 40px; border-right: 1px solid rgba(255,255,255,.05);
+    transition: background .3s;
+    position: relative;
+  }
+  .store-card:last-child { border-right: none; }
+  .store-card:hover { background: rgba(255,255,255,.03); }
+
+  /* Wax seal decoration */
+  .store-card::before {
+    content: '✦';
+    position: absolute; top: 28px; right: 28px;
+    font-size: 10px; color: var(--rust); opacity: .4;
+  }
+
+  .sc-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px; letter-spacing: .3em; text-transform: uppercase;
+    color: var(--rust-light); margin-bottom: 14px;
+  }
+  .sc-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 700; color: var(--paper); margin-bottom: 12px; line-height: 1.1;
+  }
+  .sc-desc {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 12px; line-height: 1.65; color: rgba(242,234,216,.45); margin-bottom: 24px;
+  }
+  .sc-cta {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--rust-light); text-decoration: none; opacity: .7; transition: opacity .2s;
+  }
+  .sc-cta:hover { opacity: 1; }
+
+  /* ── HOW IT WORKS ── */
+  .how-bar {
+    background: var(--paper-mid); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    padding: 72px 60px;
+    display: grid; grid-template-columns: 280px 1fr; gap: 60px; align-items: start;
+  }
+  .how-eyebrow {
+    font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .4em;
+    text-transform: uppercase; color: var(--rust); margin-bottom: 14px;
+  }
+  .how-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 38px; font-weight: 900; color: var(--ink); line-height: 1.05;
+  }
+  .how-title em { font-style: italic; color: var(--rust); }
+  .how-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; }
+  .how-step { position: relative; padding-top: 16px; border-top: 2px solid var(--border); }
+  .how-num {
+    font-family: 'Bebas Neue', sans-serif; font-size: 42px;
+    color: var(--paper-dark); line-height: 1; margin-bottom: 10px;
+  }
+  .how-step-title {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 8px;
+  }
+  .how-step-desc { font-family: 'DM Mono', monospace; font-size: 10px; line-height: 1.6; color: var(--ink-light); }
+
+  /* ── FOOTER NAV ── */
+  .aesthetic-footer {
+    background: var(--ink); padding: 36px 60px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-top: 1px solid rgba(255,255,255,.04);
+  }
+  .back-link {
+    font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .2em;
+    text-transform: uppercase; color: rgba(242,234,216,.4); text-decoration: none; transition: color .2s;
+  }
+  .back-link:hover { color: var(--paper); }
+  .other-aes { display: flex; list-style: none; gap: 32px; }
+  .other-aes a {
+    font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .18em;
+    text-transform: uppercase; color: rgba(242,234,216,.3); text-decoration: none; transition: color .2s;
+  }
+  .other-aes a:hover { color: rgba(242,234,216,.8); }
+
+  /* ── NEWSPAPER COLUMN SECTION ── */
+  .newspaper-section {
+    background: var(--white); border-top: 3px double var(--ink);
+    border-bottom: 3px double var(--ink);
+    padding: 52px 60px;
+    display: grid; grid-template-columns: 1fr 1px 1fr 1px 1fr; gap: 36px;
+    margin: 0 0 0;
+  }
+  .newspaper-divider { background: var(--border); }
+  .newspaper-col-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px; font-weight: 900; text-transform: uppercase;
+    letter-spacing: .08em; color: var(--ink); margin-bottom: 14px;
+    padding-bottom: 10px; border-bottom: 1px solid var(--border);
+  }
+  .newspaper-col-body {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 12px; line-height: 1.8; color: var(--ink-mid);
+  }
+  .newspaper-col-body strong { color: var(--rust); }
+
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- NAV -->
+<nav id="nav" class="dark">
+  <a href="index.html" class="logo">AESTHETIX</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Aesthetics</a></li>
+    <li><a href="#">New In</a></li>
+    <li><a href="#">Brands</a></li>
+  </ul>
+  <span class="nav-tag">Vintage</span>
+</nav>
+
+<!-- HERO SLIDESHOW -->
+<div class="hero">
+  <div class="slide slide-1 active"></div>
+  <div class="slide slide-2"></div>
+  <div class="slide slide-3"></div>
+  <div class="hero-burn"></div>
+  <div class="hero-vignette"></div>
+
+  <div id="dots" class="slide-dots"></div>
+  <div id="counter" class="slide-counter">01 / 03</div>
+
+  <!-- Film strip borders (cosmetic) -->
+
+  <div class="hero-content">
+    <p class="hero-eyebrow">Aesthetix — Curated World No. 09</p>
+    <h1 class="hero-title">
+      Worn
+      <span class="word-2">Stories.</span>
+    </h1>
+    <p class="hero-typewriter">
+      Thrifted, tailored, treasured. Clothing with a life before yours — band tees with faded print, Levi's broken in by strangers, silk blouses that remember someone else's summer.
+    </p>
+    <div class="hero-bottom">
+      <div class="hero-era-tags">
+        <span class="era-tag">40s — 90s</span>
+        <span class="era-tag">Thrift</span>
+        <span class="era-tag">Reworked</span>
+        <span class="era-tag">Dead Stock</span>
+      </div>
+      <div class="hero-stats">
+        <div>
+          <p class="hero-stat-num">340+</p>
+          <p class="hero-stat-label">Pieces</p>
+        </div>
+        <div>
+          <p class="hero-stat-num">12</p>
+          <p class="hero-stat-label">Stores</p>
+        </div>
+        <div>
+          <p class="hero-stat-num">6</p>
+          <p class="hero-stat-label">Decades</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NEWSPAPER CONTEXT BAND -->
+<div class="newspaper-section">
+  <div>
+    <p class="newspaper-col-title">The Aesthetic</p>
+    <p class="newspaper-col-body">Vintage dressing is memory made wearable. It rejects the disposable in favour of the durable — pieces that carry provenance, texture, and a quiet resistance to the new.</p>
+  </div>
+  <div class="newspaper-divider"></div>
+  <div>
+    <p class="newspaper-col-title">The Wardrobe</p>
+    <p class="newspaper-col-body">Levi 501s. <strong>Silk slip dresses.</strong> Collegiate crewnecks. Grandpa cardigans. Dead stock military surplus. The denim jacket that fits like it was made for you — even though it wasn't.</p>
+  </div>
+  <div class="newspaper-divider"></div>
+  <div>
+    <p class="newspaper-col-title">The Reference</p>
+    <p class="newspaper-col-body">Winona Ryder, 1993. Stevie Nicks, always. The corner of a thrift store on a Tuesday. A photograph with light-leak edges and faded colour.</p>
+  </div>
+</div>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <div class="filter-inner">
+    <ul class="filter-cats">
+      <li class="fcat active" onclick="setFilter(this)">All</li>
+      <li class="fcat" onclick="setFilter(this)">Tops</li>
+      <li class="fcat" onclick="setFilter(this)">Jackets</li>
+      <li class="fcat" onclick="setFilter(this)">Denim</li>
+      <li class="fcat" onclick="setFilter(this)">Dresses</li>
+      <li class="fcat" onclick="setFilter(this)">Knitwear</li>
+      <li class="fcat" onclick="setFilter(this)">Trousers</li>
+      <li class="fcat" onclick="setFilter(this)">Accessories</li>
+      <li class="fcat" onclick="setFilter(this)">Footwear</li>
+    </ul>
+    <div class="filter-right">
+      <select class="sort-select">
+        <option>Sort: Featured</option>
+        <option>Price: Low–High</option>
+        <option>Price: High–Low</option>
+        <option>Era: Oldest</option>
+        <option>Era: Newest</option>
+      </select>
+      <span class="results-count">340 pieces</span>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="main-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-section">
+      <p class="sb-title">Stores</p>
+      <div class="sb-stores">
+        <div class="sb-store checked" onclick="this.classList.toggle('checked')">
+          <div style="display:flex;align-items:center">
+            <div class="sb-check"></div>
+            <span class="sb-name">ASOS Marketplace</span>
+          </div>
+          <span class="sb-cnt">92</span>
+        </div>
+        <div class="sb-store" onclick="this.classList.toggle('checked')">
+          <div style="display:flex;align-items:center">
+            <div class="sb-check"></div>
+            <span class="sb-name">Rokit Vintage</span>
+          </div>
+          <span class="sb-cnt">78</span>
+        </div>
+        <div class="sb-store checked" onclick="this.classList.toggle('checked')">
+          <div style="display:flex;align-items:center">
+            <div class="sb-check"></div>
+            <span class="sb-name">Beyond Retro</span>
+          </div>
+          <span class="sb-cnt">64</span>
+        </div>
+        <div class="sb-store" onclick="this.classList.toggle('checked')">
+          <div style="display:flex;align-items:center">
+            <div class="sb-check"></div>
+            <span class="sb-name">Depop Curated</span>
+          </div>
+          <span class="sb-cnt">55</span>
+        </div>
+        <div class="sb-store" onclick="this.classList.toggle('checked')">
+          <div style="display:flex;align-items:center">
+            <div class="sb-check"></div>
+            <span class="sb-name">Cow Vintage</span>
+          </div>
+          <span class="sb-cnt">51</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <p class="sb-title">Era</p>
+      <div class="sb-tags">
+        <span class="sb-tag active" onclick="this.classList.toggle('active')">40s</span>
+        <span class="sb-tag" onclick="this.classList.toggle('active')">50s</span>
+        <span class="sb-tag" onclick="this.classList.toggle('active')">60s</span>
+        <span class="sb-tag" onclick="this.classList.toggle('active')">70s</span>
+        <span class="sb-tag" onclick="this.classList.toggle('active')">80s</span>
+        <span class="sb-tag" onclick="this.classList.toggle('active')">90s</span>
+        <span class="sb-tag" onclick="this.classList.toggle('active')">Y2K</span>
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <p class="sb-title">Condition</p>
+      <div class="sb-tags">
+        <span class="sb-tag" onclick="this.classList.toggle('active')">Mint</span>
+        <span class="sb-tag active" onclick="this.classList.toggle('active')">Good</span>
+        <span class="sb-tag active" onclick="this.classList.toggle('active')">Worn In</span>
+        <span class="sb-tag" onclick="this.classList.toggle('active')">Reworked</span>
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <p class="sb-title">Price</p>
+      <div class="price-range">
+        <div class="price-inputs">
+          <input class="price-input" type="text" value="£5">
+          <span class="price-dash">—</span>
+          <input class="price-input" type="text" value="£280">
+        </div>
+        <input class="price-slider" type="range" min="5" max="500" value="280">
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <p class="sb-title">Style</p>
+      <div class="sb-tags">
+        <span class="sb-tag" onclick="this.classList.toggle('active')">Workwear</span>
+        <span class="sb-tag" onclick="this.classList.toggle('active')">Western</span>
+        <span class="sb-tag active" onclick="this.classList.toggle('active')">Collegiate</span>
+        <span class="sb-tag" onclick="this.classList.toggle('active')">Bohemian</span>
+        <span class="sb-tag" onclick="this.classList.toggle('active')">Military</span>
+        <span class="sb-tag" onclick="this.classList.toggle('active')">Sportswear</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- GRID AREA -->
+  <div class="grid-area">
+
+    <!-- Editorial intro -->
+    <div class="editorial-band">
+      <div class="ed-headline">
+        Dress<br>like<br><em>history.</em>
+      </div>
+      <div>
+        <p class="ed-body">Every piece here has lived. Seams pulled by someone else's hands, hems let down and taken up again, buttons replaced one at a time. Vintage is the only fashion that comes with a ghost — and that's the point.</p>
+        <p class="ed-pullquote">"The best outfit is one that already knows who it is."</p>
+      </div>
+    </div>
+
+    <!-- Section: Featured Pieces -->
+    <div class="section-hdr">
+      <h2 class="section-title">Featured Pieces</h2>
+      <a href="#" class="section-view-all">View all →</a>
+    </div>
+
+    <div class="product-grid">
+
+      <div class="product-card reveal">
+        <div class="product-img p1">
+          <div class="product-tag-deco">Dead Stock</div>
+          <div class="product-era">1970s</div>
+          <div class="product-quick">Quick View</div>
+        </div>
+        <div class="product-info">
+          <p class="product-store">Rokit Vintage</p>
+          <p class="product-name">Levi's 501 Original Fit, Faded Indigo</p>
+          <div class="product-bottom">
+            <span class="product-price">£68</span>
+            <a href="#" class="product-link" target="_blank" rel="noopener noreferrer">Shop <span>→</span></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card reveal">
+        <div class="product-img p2">
+          <div class="product-tag-deco">Reworked</div>
+          <div class="product-era">1980s</div>
+          <div class="product-quick">Quick View</div>
+        </div>
+        <div class="product-info">
+          <p class="product-store">Beyond Retro</p>
+          <p class="product-name">Oversized Collegiate Crewneck — Forest</p>
+          <div class="product-bottom">
+            <span class="product-price">£42</span>
+            <a href="#" class="product-link" target="_blank" rel="noopener noreferrer">Shop <span>→</span></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card reveal">
+        <div class="product-img p3">
+          <div class="product-tag-deco">Archive</div>
+          <div class="product-era">1960s</div>
+          <div class="product-quick">Quick View</div>
+        </div>
+        <div class="product-info">
+          <p class="product-store">Cow Vintage</p>
+          <p class="product-name">Silk Slip Dress, Rust Floral</p>
+          <div class="product-bottom">
+            <span class="product-price">£88</span>
+            <a href="#" class="product-link" target="_blank" rel="noopener noreferrer">Shop <span>→</span></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card reveal">
+        <div class="product-img p4">
+          <div class="product-tag-deco">Dead Stock</div>
+          <div class="product-era">1990s</div>
+          <div class="product-quick">Quick View</div>
+        </div>
+        <div class="product-info">
+          <p class="product-store">ASOS Marketplace</p>
+          <p class="product-name">Faded Band Tee — Worn In Black</p>
+          <div class="product-bottom">
+            <span class="product-price">£24</span>
+            <a href="#" class="product-link" target="_blank" rel="noopener noreferrer">Shop <span>→</span></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card reveal">
+        <div class="product-img p5">
+          <div class="product-tag-deco">Archive</div>
+          <div class="product-era">1950s</div>
+          <div class="product-quick">Quick View</div>
+        </div>
+        <div class="product-info">
+          <p class="product-store">Depop Curated</p>
+          <p class="product-name">Workwear Chore Coat, Washed Navy</p>
+          <div class="product-bottom">
+            <span class="product-price">£110</span>
+            <a href="#" class="product-link" target="_blank" rel="noopener noreferrer">Shop <span>→</span></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card reveal">
+        <div class="product-img p6">
+          <div class="product-tag-deco">Reworked</div>
+          <div class="product-era">1970s</div>
+          <div class="product-quick">Quick View</div>
+        </div>
+        <div class="product-info">
+          <p class="product-store">Rokit Vintage</p>
+          <p class="product-name">Suede Western Jacket, Tan</p>
+          <div class="product-bottom">
+            <span class="product-price">£195</span>
+            <a href="#" class="product-link" target="_blank" rel="noopener noreferrer">Shop <span>→</span></a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Polaroid strip -->
+    <div class="section-hdr" style="margin-top: 12px;">
+      <h2 class="section-title">The Mood</h2>
+    </div>
+    <div class="polaroid-strip">
+      <div class="polaroid">
+        <div class="pol-g1"></div>
+        <p class="polaroid-caption">August '74 · California</p>
+      </div>
+      <div class="polaroid">
+        <div class="pol-g2"></div>
+        <p class="polaroid-caption">Record store · Brooklyn</p>
+      </div>
+      <div class="polaroid">
+        <div class="pol-g3"></div>
+        <p class="polaroid-caption">Film burn · Kodachrome</p>
+      </div>
+      <div class="polaroid">
+        <div class="pol-g4"></div>
+        <p class="polaroid-caption">Sunday morning · London</p>
+      </div>
+      <div class="polaroid">
+        <div class="pol-g5"></div>
+        <p class="polaroid-caption">Estate sale find · 1988</p>
+      </div>
+    </div>
+
+    <!-- Section: Denim -->
+    <div class="section-hdr" style="margin-top: 8px;">
+      <h2 class="section-title">The Denim Edit</h2>
+      <a href="#" class="section-view-all">View all →</a>
+    </div>
+    <div class="product-grid">
+
+      <div class="product-card reveal">
+        <div class="product-img p2">
+          <div class="product-tag-deco">Worn In</div>
+          <div class="product-era">1990s</div>
+          <div class="product-quick">Quick View</div>
+        </div>
+        <div class="product-info">
+          <p class="product-store">Beyond Retro</p>
+          <p class="product-name">Distressed Denim Trucker Jacket</p>
+          <div class="product-bottom">
+            <span class="product-price">£76</span>
+            <a href="#" class="product-link" target="_blank" rel="noopener noreferrer">Shop <span>→</span></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card reveal">
+        <div class="product-img p5">
+          <div class="product-tag-deco">Archive</div>
+          <div class="product-era">1980s</div>
+          <div class="product-quick">Quick View</div>
+        </div>
+        <div class="product-info">
+          <p class="product-store">Rokit Vintage</p>
+          <p class="product-name">High-Waist Mom Jeans, Stone Wash</p>
+          <div class="product-bottom">
+            <span class="product-price">£54</span>
+            <a href="#" class="product-link" target="_blank" rel="noopener noreferrer">Shop <span>→</span></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card reveal">
+        <div class="product-img p1">
+          <div class="product-tag-deco">Reworked</div>
+          <div class="product-era">1970s</div>
+          <div class="product-quick">Quick View</div>
+        </div>
+        <div class="product-info">
+          <p class="product-store">Cow Vintage</p>
+          <p class="product-name">Patchwork Denim Maxi Skirt</p>
+          <div class="product-bottom">
+            <span class="product-price">£62</span>
+            <a href="#" class="product-link" target="_blank" rel="noopener noreferrer">Shop <span>→</span></a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- STORES FEATURE -->
+<section class="stores-feature">
+  <div class="stores-feature-hdr">
+    <h2 class="sf-title">Vintage<br><em>Stores</em></h2>
+    <a href="#" class="view-all">All Stores →</a>
+  </div>
+  <div class="stores-grid">
+    <div class="store-card reveal">
+      <p class="sc-tag">Vintage</p>
+      <h3 class="sc-name">Rokit Vintage</h3>
+      <p class="sc-desc">London's original vintage institution since 1986. Dead stock, reworked denim, and the greatest selection of 70s–90s pieces in the city.</p>
+      <a href="#" class="sc-cta" target="_blank" rel="noopener noreferrer">Visit Store →</a>
+    </div>
+    <div class="store-card reveal">
+      <p class="sc-tag">Vintage</p>
+      <h3 class="sc-name">Beyond Retro</h3>
+      <p class="sc-desc">Curated thrift at scale. Five floors of sorted, tagged, and beautifully displayed vintage from every era and every aesthetic.</p>
+      <a href="#" class="sc-cta" target="_blank" rel="noopener noreferrer">Visit Store →</a>
+    </div>
+    <div class="store-card reveal">
+      <p class="sc-tag">Vintage</p>
+      <h3 class="sc-name">Cow Vintage</h3>
+      <p class="sc-desc">Notting Hill's beloved neighbourhood haunt. Quality over quantity — every piece hand-selected for character and wearability.</p>
+      <a href="#" class="sc-cta" target="_blank" rel="noopener noreferrer">Visit Store →</a>
+    </div>
+    <div class="store-card reveal">
+      <p class="sc-tag">Vintage</p>
+      <h3 class="sc-name">ASOS Marketplace</h3>
+      <p class="sc-desc">Independent vintage boutiques from across the UK in one place. From grunge-era flannels to 50s circle skirts — all verified.</p>
+      <a href="#" class="sc-cta" target="_blank" rel="noopener noreferrer">Visit Store →</a>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<div class="how-bar">
+  <div>
+    <p class="how-eyebrow">How it works</p>
+    <h2 class="how-title">One world.<br><em>Every store.</em></h2>
+  </div>
+  <div class="how-steps">
+    <div class="how-step">
+      <div class="how-num">01</div>
+      <p class="how-step-title">Pick Your Aesthetic</p>
+      <p class="how-step-desc">Choose from curated worlds. Each one a complete universe of style.</p>
+    </div>
+    <div class="how-step">
+      <div class="how-num">02</div>
+      <p class="how-step-title">Browse by Category</p>
+      <p class="how-step-desc">Tops, denim, dresses — filtered through your era and aesthetic.</p>
+    </div>
+    <div class="how-step">
+      <div class="how-num">03</div>
+      <p class="how-step-title">Shop Across Stores</p>
+      <p class="how-step-desc">Products from multiple curated vintage stores shown together.</p>
+    </div>
+    <div class="how-step">
+      <div class="how-num">04</div>
+      <p class="how-step-title">Build Your Character</p>
+      <p class="how-step-desc">This is your world now. Dress accordingly.</p>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER NAV -->
+<div class="aesthetic-footer">
+  <a href="index.html" class="back-link">← All Aesthetics</a>
+  <ul class="other-aes">
+    <li><a href="old-money.html">Old Money</a></li>
+    <li><a href="y2k.html">Y2K</a></li>
+    <li><a href="goth.html">Goth</a></li>
+    <li><a href="grunge.html">Grunge</a></li>
+    <li><a href="starboy.html">Starboy</a></li>
+    <li><a href="streetwear.html">Streetwear</a></li>
+  </ul>
+</div>
+
+<script>
+  // CURSOR
+  const cur  = document.getElementById('cursor');
+  const ring = document.getElementById('cursor-ring');
+  let mx=0,my=0,rx=0,ry=0;
+
+  document.addEventListener('mousemove', e => {
+    mx=e.clientX; my=e.clientY;
+    cur.style.left=mx+'px'; cur.style.top=my+'px';
+  });
+
+  (function loop(){ rx+=(mx-rx)*.12; ry+=(my-ry)*.12; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(loop); })();
+
+  document.querySelectorAll('a,button,.product-card,.store-card,.fcat,.sb-store,.sb-tag,.polaroid,.dot').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{ cur.style.width='16px'; cur.style.height='16px'; ring.style.width='40px'; ring.style.height='40px'; ring.style.opacity='.45'; });
+    el.addEventListener('mouseleave',()=>{ cur.style.width='8px'; cur.style.height='8px'; ring.style.width='28px'; ring.style.height='28px'; ring.style.opacity='.3'; });
+  });
+
+  // SLIDESHOW
+  const slides  = document.querySelectorAll('.slide');
+  const dotsEl  = document.getElementById('dots');
+  const countEl = document.getElementById('counter');
+  const total   = slides.length;
+  let cur_s = 0, timer;
+
+  slides.forEach((_,i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i===0?' active':'');
+    d.addEventListener('click', ()=>goTo(i));
+    dotsEl.appendChild(d);
+  });
+
+  function goTo(n) {
+    slides[cur_s].classList.remove('active');
+    dotsEl.children[cur_s].classList.remove('active');
+    cur_s = (n+total)%total;
+    slides[cur_s].classList.add('active');
+    dotsEl.children[cur_s].classList.add('active');
+    countEl.textContent = String(cur_s+1).padStart(2,'0')+' / '+String(total).padStart(2,'0');
+    clearInterval(timer); timer = setInterval(()=>goTo(cur_s+1), 5200);
+  }
+
+  timer = setInterval(()=>goTo(cur_s+1), 5200);
+  document.addEventListener('keydown', e=>{ if(e.key==='ArrowRight') goTo(cur_s+1); if(e.key==='ArrowLeft') goTo(cur_s-1); });
+
+  // NAV
+  const nav = document.getElementById('nav');
+  function updateNav() {
+    const heroH = document.querySelector('.hero').offsetHeight;
+    const past  = window.scrollY > heroH - 80;
+    nav.className = past ? 'light' : 'dark';
+    document.body.classList.toggle('on-dark', !past);
+  }
+  window.addEventListener('scroll', updateNav, {passive:true});
+  updateNav();
+
+  // SCROLL REVEAL
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if(e.isIntersecting) setTimeout(()=>e.target.classList.add('visible'), 70*(e.target.dataset.d||0)); });
+  }, {threshold:.08});
+  document.querySelectorAll('.reveal').forEach((el,i)=>{ el.dataset.d=i%5; obs.observe(el); });
+
+  // FILTER
+  function setFilter(el) { document.querySelectorAll('.fcat').forEach(c=>c.classList.remove('active')); el.classList.add('active'); }
+</script>
+</body>
+</html>
